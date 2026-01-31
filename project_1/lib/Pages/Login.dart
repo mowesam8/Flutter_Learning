@@ -54,7 +54,7 @@ class Login extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: "Email",
                 hintStyle: GoogleFonts.poppins(
-                  fontSize: 10,
+                  fontSize: 14,
                   color: Color(0xffACA7A7),
                 ),
                 filled: true,
@@ -70,7 +70,7 @@ class Login extends StatelessWidget {
               ),
             ),
           ),
-          Gap(20),
+          Gap(14),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: TextField(
@@ -78,7 +78,7 @@ class Login extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: "Password",
                 hintStyle: GoogleFonts.poppins(
-                  fontSize: 10,
+                  fontSize: 14,
                   color: Color(0xffACA7A7),
                 ),
                 filled: true,
@@ -105,7 +105,7 @@ class Login extends StatelessWidget {
                   child: Text(
                     "Forget Password?",
                     style: GoogleFonts.poppins(
-                      fontSize: 10,
+                      fontSize: 14,
                       color: PrimaryColor,
                       decoration: TextDecoration.underline,
                       decorationColor: PrimaryColor,
@@ -119,10 +119,10 @@ class Login extends StatelessWidget {
           MaterialButton(
             onPressed: () {},
             color: PrimaryColor,
-            minWidth: 200,
+            minWidth: 240,
             height: 40,
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
             ),
             elevation: 0,
             focusElevation: 0,
@@ -131,7 +131,7 @@ class Login extends StatelessWidget {
               "Login",
               style: GoogleFonts.poppins(
                 fontSize: 18,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
@@ -141,7 +141,7 @@ class Login extends StatelessWidget {
             children: [
               Text(
                 "Already have an Account? ",
-                style: GoogleFonts.poppins(fontSize: 10, color: Colors.black),
+                style: GoogleFonts.poppins(fontSize: 12, color: Colors.black),
               ),
               MaterialButton(
                 padding: EdgeInsets.all(0),
@@ -155,7 +155,8 @@ class Login extends StatelessWidget {
                 child: Text(
                   "Signup",
                   style: GoogleFonts.poppins(
-                    fontSize: 10,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                     color: PrimaryColor,
                     decoration: TextDecoration.underline,
                     decorationColor: PrimaryColor,
