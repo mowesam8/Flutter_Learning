@@ -31,10 +31,12 @@ It was created as a **learning project** to practice Flutter layouts, widgets, a
 ---
 
 ## 📱 App Screenshots
+<p align="center">
+  <img src="App Screenshots/Welcome.png" width="200"/>
+  <img src="App Screenshots/Signup.png" width="200"/>
+  <img src="App Screenshots/Login.png" width="200"/>
+</p>
 
-![Welcome Screen](App Screenshots/Welcome.png)
-![Sign Up Screen](App Screenshots/Signup.png)
-![Login Screen](App Screenshots/Login.png)
 
 ---
 
