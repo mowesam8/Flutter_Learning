@@ -7,6 +7,7 @@ import 'package:practice_on_firebase_1/Custom/Custom_TextField.dart';
 import 'package:practice_on_firebase_1/Custom/Custom_logo.dart';
 import 'package:practice_on_firebase_1/auth/signup.dart';
 import 'package:practice_on_firebase_1/pages/home.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -22,6 +23,91 @@ class _LoginState extends State<Login> {
   GlobalKey<FormState> formState = GlobalKey<FormState>();
 
   bool isLoading = false;
+
+  // Future<UserCredential?> signInWithGoogle() async {
+  //   try {
+  //     setState(() => isLoading = true);
+
+  //     final authEventFuture = GoogleSignIn.instance.authenticationEvents
+  //         .firstWhere(
+  //           (event) => event is GoogleSignInAuthenticationEventSignIn,
+  //         );
+
+  //     await GoogleSignIn.instance.authenticate();
+
+  //     final event =
+  //         await authEventFuture as GoogleSignInAuthenticationEventSignIn;
+
+  //     final GoogleSignInAccount user = event.user;
+
+  //     final googleAuth = await user.authentication;
+
+  //     final credential = GoogleAuthProvider.credential(
+  //       idToken: googleAuth.idToken,
+  //     );
+
+  //     return await FirebaseAuth.instance.signInWithCredential(credential);
+  //   } on GoogleSignInException catch (e) {
+  //     debugPrint('Google Sign-In error: ${e.code}');
+  //     return null;
+  //   } catch (e) {
+  //     debugPrint('Unknown error: $e');
+  //     return null;
+  //   } finally {
+  //     if (mounted) setState(() => isLoading = false);
+  //   }
+  // }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      setState(() => isLoading = true);
+
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance
+          .authenticate();
+
+      if (googleUser == null) {
+        debugPrint("Google Sign-In cancelled by user");
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (c) => Home()));
+    } on FirebaseAuthException catch (e) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        title: "Firebase Error",
+        desc: e.message ?? "Something went wrong",
+      ).show();
+    } on GoogleSignInException catch (e) {
+      debugPrint("Google Sign-In error: ${e.code}");
+    } catch (e) {
+      debugPrint("Unknown error: $e");
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    GoogleSignIn.instance.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,49 +175,46 @@ class _LoginState extends State<Login> {
             ),
 
             CustomButton(
-              onPressed: isLoading
-                  ? null
-                  : () async {
-                      if (formState.currentState!.validate()) {
-                        try {
-                          final credential = await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
-                                email: email.text.trim(),
-                                password: password.text,
-                              );
+              onPressed: () async {
+                if (formState.currentState!.validate()) {
+                  try {
+                    final credential = await FirebaseAuth.instance
+                        .signInWithEmailAndPassword(
+                          email: email.text.trim(),
+                          password: password.text,
+                        );
 
-                          if (!mounted) return;
+                    if (!mounted) return;
 
-                          if (credential.user!.emailVerified) {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (c) => Home()),
-                            );
-                          } else {
-                            // FirebaseAuth.instance.currentUser!.sendEmailVerification();
+                    if (credential.user!.emailVerified) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (c) => Home()),
+                      );
+                    } else {
+                      AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.error,
+                        animType: AnimType.rightSlide,
+                        title: 'Error',
+                        desc:
+                            "Please check your email and click the link to activate your account.",
+                      ).show();
+                    }
+                  } on FirebaseAuthException catch (e) {
+                    if (!mounted) return;
 
-                            AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              animType: AnimType.rightSlide,
-                              title: 'Error',
-                              desc: "Please check your email and click the link to activate your account.",
-                            ).show();
-                          }
-                        } on FirebaseAuthException catch (e) {
-                          if (!mounted) return;
-
-                          AwesomeDialog(
-                            context: context,
-                            dialogType: DialogType.error,
-                            animType: AnimType.rightSlide,
-                            title: 'Error',
-                            desc: "Invalid email or password",
-                          ).show();
-                        } finally {
-                          if (mounted) setState(() => isLoading = false);
-                        }
-                      }
-                    },
+                    AwesomeDialog(
+                      context: context,
+                      dialogType: DialogType.error,
+                      animType: AnimType.rightSlide,
+                      title: 'Error',
+                      desc: "Invalid email or password",
+                    ).show();
+                  } finally {
+                    if (mounted) setState(() => isLoading = false);
+                  }
+                }
+              },
               title: isLoading ? "Loading..." : "Login",
             ),
 
@@ -165,7 +248,9 @@ class _LoginState extends State<Login> {
                 borderRadius: BorderRadius.circular(50),
               ),
 
-              onPressed: () {},
+              onPressed: () {
+                signInWithGoogle();
+              },
 
               child: Image.asset("assets/images/google.png", width: 30),
             ),
