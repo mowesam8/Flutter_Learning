@@ -6,7 +6,6 @@ import 'package:practice_on_firebase_1/Custom/Custom_TextField.dart';
 import 'package:practice_on_firebase_1/Custom/Custom_logo.dart';
 import 'package:practice_on_firebase_1/auth/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:practice_on_firebase_1/pages/home.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});

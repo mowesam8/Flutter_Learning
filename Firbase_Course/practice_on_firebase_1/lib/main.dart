@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:practice_on_firebase_1/Custom/App_Colors.dart';
 import 'package:practice_on_firebase_1/auth/login.dart';
 import 'package:practice_on_firebase_1/pages/home.dart';
 
@@ -36,6 +37,21 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[200],
+
+          titleTextStyle: TextStyle(
+            color: AppColor.primaryColor,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+
+          iconTheme: IconThemeData(color: AppColor.primaryColor),
+        ),
+      ),
+
       home:
           (FirebaseAuth.instance.currentUser != null &&
               FirebaseAuth.instance.currentUser!.emailVerified)

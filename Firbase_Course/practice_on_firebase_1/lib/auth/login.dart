@@ -24,40 +24,6 @@ class _LoginState extends State<Login> {
 
   bool isLoading = false;
 
-  // Future<UserCredential?> signInWithGoogle() async {
-  //   try {
-  //     setState(() => isLoading = true);
-
-  //     final authEventFuture = GoogleSignIn.instance.authenticationEvents
-  //         .firstWhere(
-  //           (event) => event is GoogleSignInAuthenticationEventSignIn,
-  //         );
-
-  //     await GoogleSignIn.instance.authenticate();
-
-  //     final event =
-  //         await authEventFuture as GoogleSignInAuthenticationEventSignIn;
-
-  //     final GoogleSignInAccount user = event.user;
-
-  //     final googleAuth = await user.authentication;
-
-  //     final credential = GoogleAuthProvider.credential(
-  //       idToken: googleAuth.idToken,
-  //     );
-
-  //     return await FirebaseAuth.instance.signInWithCredential(credential);
-  //   } on GoogleSignInException catch (e) {
-  //     debugPrint('Google Sign-In error: ${e.code}');
-  //     return null;
-  //   } catch (e) {
-  //     debugPrint('Unknown error: $e');
-  //     return null;
-  //   } finally {
-  //     if (mounted) setState(() => isLoading = false);
-  //   }
-  // }
-
   Future<void> signInWithGoogle() async {
     try {
       setState(() => isLoading = true);
@@ -66,7 +32,6 @@ class _LoginState extends State<Login> {
           .authenticate();
 
       if (googleUser == null) {
-        debugPrint("Google Sign-In cancelled by user");
         return;
       }
 
@@ -164,11 +129,67 @@ class _LoginState extends State<Login> {
                     },
                   ),
 
-                  Container(
-                    margin: EdgeInsets.only(top: 10, bottom: 30),
-                    alignment: Alignment.topRight,
+                  GestureDetector(
+                    onTap: () async {
+                      if (email.text == "") {
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.error,
+                          animType: AnimType.rightSlide,
+                          title: 'Error',
+                          desc:
+                              "Please add your email then you can click on Forget Password",
+                        ).show();
 
-                    child: Text("Forget Password ?"),
+                        return;
+                      }
+
+                      try {
+                        await FirebaseAuth.instance.sendPasswordResetEmail(
+                          email: email.text,
+                        );
+
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.success,
+                          animType: AnimType.rightSlide,
+                          title: 'Done',
+                          desc:
+                              "If this email is registered, you will receive a password reset link.",
+                        ).show();
+                      } on FirebaseAuthException catch (e) {
+                        String message =
+                            "Something went wrong. Please try again.";
+
+                        if (e.code == "invalid-email") {
+                          message = "The email address is badly formatted.";
+                        } else if (e.code == "network-request-failed") {
+                          message = "Check your internet connection.";
+                        } else if (e.code == "too-many-requests") {
+                          message = "Too many requests. Try again later.";
+                        }
+
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.error,
+                          animType: AnimType.rightSlide,
+                          title: 'Error',
+                          desc: message,
+                        ).show();
+                      }
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 10, bottom: 30),
+                      alignment: Alignment.topRight,
+
+                      child: Text(
+                        "Forget Password ?",
+                        style: TextStyle(
+                          color: AppColor.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
