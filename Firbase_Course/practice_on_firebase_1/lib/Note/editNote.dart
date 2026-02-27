@@ -1,46 +1,47 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:practice_on_firebase_1/Custom/App_Colors.dart';
 import 'package:practice_on_firebase_1/Custom/Custom_Button.dart';
 import 'package:practice_on_firebase_1/Custom/Custom_TextField.dart';
-import 'package:practice_on_firebase_1/pages/home.dart';
+import 'package:practice_on_firebase_1/Note/viewNote.dart';
 
-class Addcategory extends StatefulWidget {
-  const Addcategory({super.key});
+class EditNote extends StatefulWidget {
+  const EditNote({super.key, required this.noteDocId, required this.cateogryDocId, required this.oldValue});
+  final String noteDocId;
+  final String cateogryDocId;
+  final String oldValue;
 
   @override
-  State<Addcategory> createState() => _AddcategoryState();
+  State<EditNote> createState() => _EditNoteState();
 }
 
-class _AddcategoryState extends State<Addcategory> {
+class _EditNoteState extends State<EditNote> {
   GlobalKey<FormState> formState = GlobalKey<FormState>();
 
-  TextEditingController name = TextEditingController();
-
-  CollectionReference categories = FirebaseFirestore.instance.collection(
-    'categories',
-  );
+  TextEditingController note = TextEditingController();
 
   bool isLoading = false;
 
-  addCategory() async {
+  editNote() async {
+    CollectionReference collectionNote = FirebaseFirestore.instance
+        .collection('categories')
+        .doc(widget.cateogryDocId)
+        .collection("note");
+
     if (formState.currentState!.validate()) {
       try {
         isLoading = true;
         setState(() {});
 
-        DocumentReference response = await categories.add({
-          "name": name.text,
-          "id": FirebaseAuth.instance.currentUser!.uid,
-        });
+        await collectionNote.doc(widget.noteDocId).update({"note": note.text});
 
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (c) => Home()),
-          (route) => false,
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (c) => ViewNote(categoryId: widget.cateogryDocId)),
         );
       } catch (e) {
+        if (!mounted) return;
         AwesomeDialog(
           context: context,
           dialogType: DialogType.error,
@@ -49,21 +50,30 @@ class _AddcategoryState extends State<Addcategory> {
           desc: "Error $e",
         ).show();
       } finally {
-        isLoading = false;
+        if (mounted) {
+          isLoading = false;
+          setState(() {});
+        }
       }
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    note.text = widget.oldValue;
+  }
+
+  @override
   void dispose() {
-    name.dispose();
+    note.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add Category")),
+      appBar: AppBar(title: Text("Edit Note")),
       body: Form(
         key: formState,
 
@@ -82,8 +92,8 @@ class _AddcategoryState extends State<Addcategory> {
                     ),
                     child: CustomTextfield(
                       labelText: "Name",
-                      hintText: "Enter Name",
-                      controller: name,
+                      hintText: "Enter Your Note",
+                      controller: note,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return "This field can`t be Empty";
@@ -96,10 +106,10 @@ class _AddcategoryState extends State<Addcategory> {
 
                   CustomButton(
                     onPressed: () {
-                      addCategory();
+                      editNote();
                     },
 
-                    title: "Add",
+                    title: "Save",
                   ),
                 ],
               ),

@@ -1,20 +1,21 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:practice_on_firebase_1/Custom/App_Colors.dart';
 import 'package:practice_on_firebase_1/Custom/Custom_Button.dart';
 import 'package:practice_on_firebase_1/Custom/Custom_TextField.dart';
 import 'package:practice_on_firebase_1/pages/home.dart';
 
-class Addcategory extends StatefulWidget {
-  const Addcategory({super.key});
+class Editcategory extends StatefulWidget {
+  const Editcategory({super.key, required this.docId, required this.oldName});
+  final String docId;
+  final String oldName;
 
   @override
-  State<Addcategory> createState() => _AddcategoryState();
+  State<Editcategory> createState() => _EditcategoryState();
 }
 
-class _AddcategoryState extends State<Addcategory> {
+class _EditcategoryState extends State<Editcategory> {
   GlobalKey<FormState> formState = GlobalKey<FormState>();
 
   TextEditingController name = TextEditingController();
@@ -25,16 +26,13 @@ class _AddcategoryState extends State<Addcategory> {
 
   bool isLoading = false;
 
-  addCategory() async {
+  editCategory() async {
     if (formState.currentState!.validate()) {
       try {
         isLoading = true;
         setState(() {});
 
-        DocumentReference response = await categories.add({
-          "name": name.text,
-          "id": FirebaseAuth.instance.currentUser!.uid,
-        });
+        await categories.doc(widget.docId).update({"name": name.text});
 
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (c) => Home()),
@@ -55,6 +53,12 @@ class _AddcategoryState extends State<Addcategory> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    name.text = widget.oldName;
+  }
+
+  @override
   void dispose() {
     name.dispose();
     super.dispose();
@@ -63,7 +67,7 @@ class _AddcategoryState extends State<Addcategory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add Category")),
+      appBar: AppBar(title: Text("Edit Category")),
       body: Form(
         key: formState,
 
@@ -96,10 +100,10 @@ class _AddcategoryState extends State<Addcategory> {
 
                   CustomButton(
                     onPressed: () {
-                      addCategory();
+                      editCategory();
                     },
 
-                    title: "Add",
+                    title: "Edit",
                   ),
                 ],
               ),

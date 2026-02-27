@@ -21,156 +21,180 @@ class _SignupState extends State<Signup> {
 
   GlobalKey<FormState> formState = GlobalKey<FormState>();
 
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    username.dispose();
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            Form(
-              key: formState,
-
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(color: AppColor.secondaryColor),
+            )
+          : Container(
+              padding: EdgeInsets.all(20),
+              child: ListView(
                 children: [
-                  SizedBox(height: 20),
+                  Form(
+                    key: formState,
 
-                  CustomLogo(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20),
+
+                        CustomLogo(),
+
+                        SizedBox(height: 30),
+
+                        Text(
+                          "Signup",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        Text(
+                          "ُEnter Your Personal Information",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+
+                        CustomTextfield(
+                          labelText: "Username",
+                          hintText: "Enter your name",
+                          controller: username,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "This field can`t be Empty";
+                            }
+
+                            return null;
+                          },
+                        ),
+
+                        CustomTextfield(
+                          labelText: "Email",
+                          hintText: "Enter your email",
+                          controller: email,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "This field can`t be Empty";
+                            }
+
+                            return null;
+                          },
+                        ),
+
+                        CustomTextfield(
+                          labelText: "Password",
+                          hintText: "Enter your password",
+                          controller: password,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "This field can`t be Empty";
+                            }
+
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
 
                   SizedBox(height: 30),
 
-                  Text(
-                    "Signup",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
+                  CustomButton(
+                    onPressed: () async {
+                      if (formState.currentState!.validate()) {
+                        try {
+                          isLoading = true;
+                          setState(() {});
 
-                  Text(
-                    "ُEnter Your Personal Information",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                          final credential = await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                email: email.text,
+                                password: password.text,
+                              );
 
-                  CustomTextfield(
-                    labelText: "Username",
-                    hintText: "Enter your name",
-                    controller: username,
-                    validator: (val) {
-                      if (val == null || val.trim().isEmpty) {
-                        return "This field can`t be Empty";
+                          FirebaseAuth.instance.currentUser!
+                              .sendEmailVerification();
+
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (c) => Login()),
+                          );
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'weak-password') {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              animType: AnimType.rightSlide,
+                              title: 'Error',
+                              desc: 'The password provided is too weak.',
+                            ).show();
+                          } else if (e.code == 'email-already-in-use') {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              animType: AnimType.rightSlide,
+                              title: 'Error',
+                              desc:
+                                  'The account already exists for that email.',
+                            ).show();
+                          }
+                        } catch (e) {
+                          print(e);
+                        } finally {
+                          if (mounted) setState(() => isLoading = false);
+                        }
                       }
-
-                      return null;
                     },
+                    title: "Signup",
                   ),
 
-                  CustomTextfield(
-                    labelText: "Email",
-                    hintText: "Enter your email",
-                    controller: email,
-                    validator: (val) {
-                      if (val == null || val.trim().isEmpty) {
-                        return "This field can`t be Empty";
-                      }
+                  SizedBox(height: 5),
 
-                      return null;
-                    },
-                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
 
-                  CustomTextfield(
-                    labelText: "Password",
-                    hintText: "Enter your password",
-                    controller: password,
-                    validator: (val) {
-                      if (val == null || val.trim().isEmpty) {
-                        return "This field can`t be Empty";
-                      }
+                    children: [
+                      Text(
+                        "Already Have An Account? ",
+                        style: TextStyle(fontSize: 14),
+                      ),
 
-                      return null;
-                    },
+                      MaterialButton(
+                        padding: EdgeInsets.zero,
+                        minWidth: 0,
+
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (c) => Login()),
+                          );
+                        },
+
+                        child: Text(
+                          "Login",
+
+                          style: TextStyle(
+                            color: AppColor.primaryColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-
-            SizedBox(height: 30),
-
-            CustomButton(
-              onPressed: () async {
-                if (formState.currentState!.validate()) {
-                  try {
-                    final credential = await FirebaseAuth.instance
-                        .createUserWithEmailAndPassword(
-                          email: email.text,
-                          password: password.text,
-                        );
-
-                    FirebaseAuth.instance.currentUser!.sendEmailVerification();
-
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (c) => Login()),
-                    );
-                  } on FirebaseAuthException catch (e) {
-                    if (e.code == 'weak-password') {
-                      AwesomeDialog(
-                        context: context,
-                        dialogType: DialogType.error,
-                        animType: AnimType.rightSlide,
-                        title: 'Error',
-                        desc: 'The password provided is too weak.',
-                      ).show();
-                    } else if (e.code == 'email-already-in-use') {
-                      AwesomeDialog(
-                        context: context,
-                        dialogType: DialogType.error,
-                        animType: AnimType.rightSlide,
-                        title: 'Error',
-                        desc: 'The account already exists for that email.',
-                      ).show();
-                    }
-                  } catch (e) {
-                    print(e);
-                  }
-                }
-              },
-              title: "Signup",
-            ),
-
-            SizedBox(height: 5),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-
-              children: [
-                Text(
-                  "Already Have An Account? ",
-                  style: TextStyle(fontSize: 14),
-                ),
-
-                MaterialButton(
-                  padding: EdgeInsets.zero,
-                  minWidth: 0,
-
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (c) => Login()),
-                    );
-                  },
-
-                  child: Text(
-                    "Login",
-
-                    style: TextStyle(
-                      color: AppColor.primaryColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
