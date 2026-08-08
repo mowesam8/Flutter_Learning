@@ -26,8 +26,7 @@ class _LoginState extends State<Login> {
 
   Future<void> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance
-          .authenticate();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       if (googleUser == null) {
         return;
@@ -41,30 +40,29 @@ class _LoginState extends State<Login> {
 
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
       );
 
-      final userCredential = await FirebaseAuth.instance.signInWithCredential(
-        credential,
-      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (!mounted) return;
 
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (c) => Home()));
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
+      print("Google Sign-In Error: $e");
       AwesomeDialog(
         context: context,
         dialogType: DialogType.error,
-        title: "Firebase Error",
-        desc: e.message ?? "Something went wrong",
+        title: "Error",
       ).show();
-    } on GoogleSignInException catch (e) {
-      debugPrint("Google Sign-In error: ${e.code}");
-    } catch (e) {
-      debugPrint("Unknown error: $e");
     } finally {
-      if (mounted) isLoading = false;
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -72,7 +70,6 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
 
-    GoogleSignIn.instance.initialize();
   }
 
   @override
@@ -267,7 +264,7 @@ class _LoginState extends State<Login> {
                       Text(
                         "  Or Login With Google  ",
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400,
                           color: Colors.grey,
                         ),

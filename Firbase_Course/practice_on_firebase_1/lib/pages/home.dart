@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:practice_on_firebase_1/Categories/addCategory.dart';
 import 'package:practice_on_firebase_1/Categories/editCategory.dart';
 import 'package:practice_on_firebase_1/Custom/App_Colors.dart';
@@ -55,6 +56,8 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             onPressed: () async {
+              GoogleSignIn googleSignIn = GoogleSignIn();
+              googleSignIn.disconnect();
               await FirebaseAuth.instance.signOut();
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (c) => Login()),
@@ -96,7 +99,7 @@ class _HomeState extends State<Home> {
                 itemCount: data.length,
 
                 itemBuilder: (context, index) {
-                  return GestureDetector(
+                  return InkWell(
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
