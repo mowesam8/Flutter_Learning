@@ -43,9 +43,6 @@ dependencies:
   awesome_dialog: ^3.3.0
   image_picker: ^1.1.2
   flutter_local_notifications: ^21.0.0
-  http: ^1.6.0
-  googleapis_auth: ^2.3.0
-  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:

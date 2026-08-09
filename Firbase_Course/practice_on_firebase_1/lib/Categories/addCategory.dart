@@ -31,7 +31,7 @@ class _AddcategoryState extends State<Addcategory> {
         isLoading = true;
         setState(() {});
 
-        DocumentReference response = await categories.add({
+        await categories.add({
           "name": name.text,
           "id": FirebaseAuth.instance.currentUser!.uid,
         });
@@ -81,7 +81,7 @@ class _AddcategoryState extends State<Addcategory> {
                       horizontal: 25,
                     ),
                     child: CustomTextfield(
-                      labelText: "Name",
+                      labelText: "Category Name",
                       hintText: "Enter Name",
                       controller: name,
                       validator: (val) {

@@ -10,8 +10,8 @@ import 'package:practice_on_firebase_1/pages/home.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print(";;;;;;;;;;;;;;;;;;;;background message;;;;;;;;;;;;;;;;;;;;;;");
-  print(message.notification!.title);
-  print(message.notification!.body);
+  print(message.notification?.title);
+  print(message.notification?.body);
 }
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(

@@ -27,7 +27,7 @@ class _HomeState extends State<Home> {
         .where("id", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
         .get();
 
-    data.addAll(querySnapshot.docs);
+    data = querySnapshot.docs;
 
     isLoading = false;
 
@@ -51,20 +51,22 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.white,
 
       appBar: AppBar(
-        title: Text("Home Page"),
+        title: Text("My Notes"),
 
         actions: [
           IconButton(
             onPressed: () async {
               GoogleSignIn googleSignIn = GoogleSignIn();
-              googleSignIn.disconnect();
+              await googleSignIn.signOut();
               await FirebaseAuth.instance.signOut();
+              if (!mounted) return;
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (c) => Login()),
                 (route) => false,
               );
             },
             icon: Icon(Icons.logout_outlined),
+            tooltip: "Logout",
           ),
         ],
       ),
@@ -85,6 +87,32 @@ class _HomeState extends State<Home> {
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(color: AppColor.secondaryColor),
+            )
+          : data.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.note_add_outlined,
+                    size: 80,
+                    color: AppColor.secondaryColor,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "No categories yet",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Tap + to create your first category",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
             )
           : Padding(
               padding: const EdgeInsets.all(10),
@@ -113,18 +141,23 @@ class _HomeState extends State<Home> {
                         context: context,
                         dialogType: DialogType.infoReverse,
                         animType: AnimType.rightSlide,
-                        title: "Manage This Note",
-                        desc: "You can edit or permanently delete this note",
+                        title: "Manage This Category",
+                        desc: "You can edit or permanently delete this category",
 
                         showCloseIcon: true,
                         headerAnimationLoop: false,
 
                         btnCancelText: "Delete",
+                        btnOkText: "Edit",
+                        btnOkColor: Colors.orange,
+
                         btnCancelOnPress: () async {
                           await FirebaseFirestore.instance
                               .collection("categories")
                               .doc(data[index].id)
                               .delete();
+
+                          if (!mounted) return;
 
                           Navigator.pushReplacement(
                             context,
@@ -132,7 +165,6 @@ class _HomeState extends State<Home> {
                           );
                         },
 
-                        btnOkText: "Edit",
                         btnOkOnPress: () async {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -143,30 +175,33 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         },
-                        btnOkColor: Colors.orange,
                       ).show();
                     },
                     child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.note_alt_outlined,
-                              size: 100,
-                              color: AppColor.secondaryColor,
-                            ),
+                      elevation: 2,
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.note_alt_outlined,
+                            size: 70,
+                            color: AppColor.secondaryColor,
+                          ),
 
-                            Text(
-                              data[index]["name"],
+                          SizedBox(height: 12),
 
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          Text(
+                            data[index]["name"],
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   );

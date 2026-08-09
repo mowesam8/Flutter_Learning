@@ -28,7 +28,7 @@ class _ViewNoteState extends State<ViewNote> {
         .collection("note")
         .get();
 
-    data.addAll(querySnapshot.docs);
+    data = querySnapshot.docs;
 
     isLoading = false;
 
@@ -101,6 +101,32 @@ class _ViewNoteState extends State<ViewNote> {
                   color: AppColor.secondaryColor,
                 ),
               )
+            : data.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.notes_outlined,
+                      size: 80,
+                      color: AppColor.secondaryColor,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      "No notes yet",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "Tap + to add your first note",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              )
             : Padding(
                 padding: const EdgeInsets.all(10),
                 child: GridView.builder(
@@ -133,40 +159,51 @@ class _ViewNoteState extends State<ViewNote> {
                           dialogType: DialogType.warning,
                           animType: AnimType.rightSlide,
                           title: "Delete This Note",
-                          desc: "Are you sure you want to delete this note permanently",
+                          desc:
+                              "Are you sure you want to delete this note permanently",
 
                           showCloseIcon: true,
                           headerAnimationLoop: false,
+                          btnCancelText: "Cancel",
 
-                          btnCancelOnPress: () async {
-                            
-                          },
-
+                          btnOkText: "Delete",
                           btnOkOnPress: () async {
                             await FirebaseFirestore.instance
                                 .collection("categories")
-                                .doc(widget.categoryId).collection("note").doc(data[index].id)
+                                .doc(widget.categoryId)
+                                .collection("note")
+                                .doc(data[index].id)
                                 .delete();
+
+                            if (!mounted) return;
 
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (c) => ViewNote(categoryId: widget.categoryId)),
+                              MaterialPageRoute(
+                                builder: (c) =>
+                                    ViewNote(categoryId: widget.categoryId),
+                              ),
                             );
                           },
                         ).show();
                       },
 
                       child: Card(
+                        elevation: 2,
                         child: Padding(
                           padding: EdgeInsets.all(20),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                data[index]["note"],
-
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Text(
+                                  data[index]["note"],
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],

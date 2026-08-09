@@ -32,7 +32,7 @@ class _AddNoteState extends State<AddNote> {
         isLoading = true;
         setState(() {});
 
-        DocumentReference response = await collectionNote.add({
+        await collectionNote.add({
           "note": note.text,
         });
 
@@ -80,7 +80,7 @@ class _AddNoteState extends State<AddNote> {
                       horizontal: 25,
                     ),
                     child: CustomTextfield(
-                      labelText: "Name",
+                      labelText: "Note",
                       hintText: "Enter Your Note",
                       controller: note,
                       validator: (val) {

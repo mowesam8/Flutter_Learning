@@ -5,13 +5,21 @@ class CustomTextfield extends StatelessWidget {
   const CustomTextfield({
     super.key,
     required this.labelText,
-    required this.hintText, required this.controller,required this.validator,
+    required this.hintText,
+    required this.controller,
+    required this.validator,
+    this.obscureText = false,
+    this.keyboardType,
+    this.textInputAction,
   });
 
   final String labelText;
   final String hintText;
   final TextEditingController controller;
   final String? Function(String?)? validator;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +40,12 @@ class CustomTextfield extends StatelessWidget {
 
           validator: validator,
           
+          obscureText: obscureText,
+
+          keyboardType: keyboardType,
+
+          textInputAction: textInputAction,
+
           cursorColor: AppColor.secondaryColor,
 
           decoration: InputDecoration(

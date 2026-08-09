@@ -85,7 +85,7 @@ class _EditcategoryState extends State<Editcategory> {
                       horizontal: 25,
                     ),
                     child: CustomTextfield(
-                      labelText: "Name",
+                      labelText: "Category Name",
                       hintText: "Enter Name",
                       controller: name,
                       validator: (val) {

@@ -91,7 +91,7 @@ class _EditNoteState extends State<EditNote> {
                       horizontal: 25,
                     ),
                     child: CustomTextfield(
-                      labelText: "Name",
+                      labelText: "Note",
                       hintText: "Enter Your Note",
                       controller: note,
                       validator: (val) {

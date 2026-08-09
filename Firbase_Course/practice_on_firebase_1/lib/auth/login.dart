@@ -119,9 +119,16 @@ class _LoginState extends State<Login> {
                           labelText: "Email",
                           hintText: "Enter your email",
                           controller: email,
+                          keyboardType: TextInputType.emailAddress,
                           validator: (val) {
                             if (val == null || val.trim().isEmpty) {
                               return "This field can`t be Empty";
+                            }
+
+                            if (!RegExp(
+                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                            ).hasMatch(val.trim())) {
+                              return "Enter a valid email address";
                             }
 
                             return null;
@@ -132,9 +139,14 @@ class _LoginState extends State<Login> {
                           labelText: "Password",
                           hintText: "Enter your password",
                           controller: password,
+                          obscureText: true,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty) {
+                            if (val == null || val.isEmpty) {
                               return "This field can`t be Empty";
+                            }
+
+                            if (val.length < 8) {
+                              return "Password must be at least 8 characters";
                             }
 
                             return null;
@@ -143,7 +155,7 @@ class _LoginState extends State<Login> {
 
                         GestureDetector(
                           onTap: () async {
-                            if (email.text == "") {
+                            if (email.text.trim().isEmpty) {
                               AwesomeDialog(
                                 context: context,
                                 dialogType: DialogType.error,
@@ -158,7 +170,7 @@ class _LoginState extends State<Login> {
 
                             try {
                               await FirebaseAuth.instance
-                                  .sendPasswordResetEmail(email: email.text);
+                                  .sendPasswordResetEmail(email: email.text.trim());
 
                               AwesomeDialog(
                                 context: context,
@@ -240,12 +252,41 @@ class _LoginState extends State<Login> {
                         } on FirebaseAuthException catch (e) {
                           if (!mounted) return;
 
+                          String message;
+
+                          switch (e.code) {
+                            case 'user-not-found':
+                            case 'wrong-password':
+                            case 'invalid-credential':
+                              message = "Invalid email or password";
+                              break;
+                            case 'invalid-email':
+                              message =
+                                  "The email address is badly formatted.";
+                              break;
+                            case 'user-disabled':
+                              message =
+                                  "This account has been disabled.";
+                              break;
+                            case 'too-many-requests':
+                              message =
+                                  "Too many failed attempts. Try again later.";
+                              break;
+                            case 'network-request-failed':
+                              message =
+                                  "Check your internet connection and try again.";
+                              break;
+                            default:
+                              message =
+                                  "Something went wrong. Please try again.";
+                          }
+
                           AwesomeDialog(
                             context: context,
                             dialogType: DialogType.error,
                             animType: AnimType.rightSlide,
                             title: 'Error',
-                            desc: "Invalid email or password",
+                            desc: message,
                           ).show();
                         } finally {
                           if (mounted) isLoading = false;
