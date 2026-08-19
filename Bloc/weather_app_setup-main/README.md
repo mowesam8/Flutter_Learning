@@ -5,8 +5,8 @@
 **A clean Flutter weather application refactored from Provider to the Cubit (`flutter_bloc`) state-management pattern.**
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter"/>
-  <img src="https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart"/>
+  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter"/>
+  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart"/>
   <img src="https://img.shields.io/badge/Cubit-7B1FA2?style=for-the-badge&logo=flutter&logoColor=white" alt="Cubit"/>
   <img src="https://img.shields.io/badge/WeatherAPI-FF6F00?style=for-the-badge&logo=api&logoColor=white" alt="API"/>
 </p>
