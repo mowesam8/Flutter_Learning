@@ -27,5 +27,6 @@ lib/
 │   ├── counter_cubit.dart    # Manages the logic for points increment
 │   └── counter_state.dart    # Defines the states for the counter
 └── main.dart                 # Main entry point and UI implementation
+```
 
 *Developed as part of the Flutter Advanced Course (BLoC & MVVM) by Eng. Tharwat Samy.*
