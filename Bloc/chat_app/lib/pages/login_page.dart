@@ -21,7 +21,6 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<LoginCubit, LoginState>(
-      // Side effects only: feedback + navigation.
       listener: (context, state) {
         if (state is LoginFailure) {
           showSnackBar(context, state.errorMessage);
@@ -29,7 +28,6 @@ class LoginPage extends StatelessWidget {
           Navigator.pushNamed(context, ChatPage.id, arguments: email);
         }
       },
-      // Rebuilds on every state change -> spinner actually appears/disappears.
       builder: (context, state) {
         return ModalProgressHUD(
           inAsyncCall: state is LoginLoading,
