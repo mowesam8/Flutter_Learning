@@ -12,8 +12,7 @@ class ChatPage extends StatelessWidget {
   TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final String email = ModalRoute.of(context)!.settings.arguments as String;
-
+final email = ModalRoute.of(context)!.settings.arguments as String? ?? 'No Email';
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,

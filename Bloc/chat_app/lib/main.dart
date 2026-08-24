@@ -7,6 +7,7 @@ import 'package:scholar_chat/pages/cubits/auth_cubit/auth_cubit.dart';
 import 'package:scholar_chat/pages/cubits/chat_cubit/chat_cubit.dart';
 import 'package:scholar_chat/pages/login_page.dart';
 import 'package:scholar_chat/pages/resgister_page.dart';
+import 'package:scholar_chat/simple_bloc_observer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,9 @@ void main() async {
   try {
     await Firebase.initializeApp();
   } catch (e) {}
+
+  Bloc.observer = SimpleBlocObserver();
+  
   runApp(ScholarChat());
 }
 
