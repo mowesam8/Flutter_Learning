@@ -2,16 +2,15 @@ import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meta/meta.dart';
 
-part 'login_state.dart';
+part 'auth_state.dart';
 
-class LoginCubit extends Cubit<LoginState> {
-  LoginCubit() : super(LoginInitial());
+class AuthCubit extends Cubit<AuthState> {
+  AuthCubit() : super(AuthInitial());
 
   Future<void> loginUser({
     required String email,
     required String password,
   }) async {
-    // Always start from a clean loading state.
     emit(LoginLoading());
 
     try {
@@ -22,9 +21,27 @@ class LoginCubit extends Cubit<LoginState> {
     } on FirebaseAuthException catch (ex) {
       emit(LoginFailure(errorMessage: _messageForCode(ex.code)));
     } on Exception {
-      emit(const LoginFailure(
+      emit( LoginFailure(
         errorMessage: 'Something went wrong, please try again.',
       ));
+    }
+  }
+
+  Future<void> registerUser({
+    required String email,
+    required String password,
+  }) async {
+    emit(RegisterLoading());
+
+    try {
+      UserCredential user = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      emit(RegisterSucces());
+    } on FirebaseAuthException catch (ex) {
+      emit(LoginFailure(errorMessage: _messageForCode(ex.code)));
+    } on Exception catch (e) {
+      emit(RegisterFailure(errorMessage: "Something went wrong, please try again."));
     }
   }
 
